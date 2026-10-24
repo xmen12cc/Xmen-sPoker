@@ -38,7 +38,7 @@ export function evaluate5(cards) {
     .sort((a, b) => b.count - a.count || b.value - a.value);
 
   const category = determineCategory(values, suits, isFlush, isStraight, straightHigh, groups, uniqueValues);
-  const tiebreak = computeTiebreak(values, straightHigh, isFlush, isStraight, groups);
+  const tiebreak = computeTiebreak(sorted, straightHigh, isFlush, isStraight, groups);
 
   return { category, name: HAND_NAMES[category], tiebreak };
 }
@@ -115,4 +115,46 @@ export function compareHands(a, b) {
 function rankValue(rank) {
   const RANK_VALUES = { '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,J:11,Q:12,K:13,A:14 };
   return RANK_VALUES[rank];
+}
+
+export function evaluateBest(cards) {
+  if (cards.length < 5 || cards.length > 7) {
+    throw new Error('Need 5 to 7 cards');
+  }
+
+  const combinations = (arr, k) => {
+    if (k === 0) return [[]];
+    const result = [];
+    for (let i = 0; i < arr.length; i++) {
+      const rest = combinations(arr.slice(i + 1), k - 1);
+      for (const combo of rest) {
+        result.push([arr[i], ...combo]);
+      }
+    }
+    return result;
+  };
+
+  const allCombinations = combinations(cards, 5);
+  let best = null;
+  let bestIndex = -1;
+
+  for (let i = 0; i < allCombinations.length; i++) {
+    const result = evaluate5(allCombinations[i]);
+    if (best === null) {
+      best = result;
+      bestIndex = i;
+    } else {
+      const cmp = compareHands(result, best);
+      if (cmp > 0) {
+        best = result;
+        bestIndex = i;
+      }
+    }
+  }
+
+  return { ...best, cards: allCombinations[bestIndex] };
+}
+
+export function describeHand(result) {
+  return result.name;
 }
