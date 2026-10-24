@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import Blackjack from './components/Blackjack.jsx'
 import Poker from './components/Poker.jsx'
+import SoundToggle from './components/SoundToggle.jsx'
 
 const App = () => {
   const [view, setView] = useState('lobby')
 
   return (
     <div className="app">
+      <SoundToggle />
       {view === 'lobby' && (
         <div className="lobby">
           <h1>Xmen's Poker</h1>
