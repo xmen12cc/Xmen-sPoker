@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { newPokerGame, startHand, applyAction, legalActions } from '../engine/poker.js'
 import { playCasinoTurn } from '../engine/pokerAI.js'
+import { play } from '../audio/sound.js'
 import PlayingCard from './PlayingCard.jsx'
 import './poker.css'
 
 export default function Poker({ onBack }) {
   const [game, setGame] = useState(() => newPokerGame(1000, 1000))
   const [raiseTo, setRaiseTo] = useState(0)
+  const prevCommunityLength = useRef(0)
+  const prevCasinoBet = useRef(0)
+  const resultTimeoutRef = useRef(null)
 
   const inHand = game.street !== 'idle' && game.street !== 'done'
   const myTurn = inHand && game.toAct === 'player'
@@ -29,8 +33,66 @@ export default function Poker({ onBack }) {
     if (myTurn) setRaiseTo(la.minRaiseTo)
   }, [game.street, game.currentBet, game.toAct])
 
-  const act = (action, amount) => setGame((g) => applyAction(g, action, amount))
-  const deal = () => setGame((g) => startHand(g))
+  useEffect(() => {
+    const prev = prevCommunityLength.current
+    const current = game.community.length
+    if (current > prev) {
+      const timeouts = []
+      for (let i = 0; i < current - prev; i++) {
+        const t = setTimeout(() => play('cardFlip'), i * 120)
+        timeouts.push(t)
+      }
+      prevCommunityLength.current = current
+      return () => timeouts.forEach((t) => clearTimeout(t))
+    }
+    prevCommunityLength.current = current
+  }, [game.community])
+
+  useEffect(() => {
+    const prev = prevCasinoBet.current
+    prevCasinoBet.current = game.casino.bet
+    if (game.casino.bet > prev && game.street !== 'idle') {
+      const t = setTimeout(() => play('bet'), 0)
+      return () => clearTimeout(t)
+    }
+  }, [game.casino.bet, game.street])
+
+  useEffect(() => {
+    if (game.street === 'done') {
+      if (game.winner === 'player') {
+        const t = setTimeout(() => play('win'), 400)
+        resultTimeoutRef.current = t
+      } else if (game.winner === 'casino') {
+        const t = setTimeout(() => play('lose'), 400)
+        resultTimeoutRef.current = t
+      } else if (game.winner === 'tie') {
+        const t = setTimeout(() => play('push'), 400)
+        resultTimeoutRef.current = t
+      }
+    }
+    return () => {
+      if (resultTimeoutRef.current) {
+        clearTimeout(resultTimeoutRef.current)
+      }
+    }
+  }, [game.street, game.handNumber])
+
+  const act = (action, amount) => {
+    if (action === 'fold') play('fold')
+    else if (action === 'check') play('check')
+    else if (action === 'call') play('bet')
+    else if (action === 'raise') play('bet')
+    setGame((g) => applyAction(g, action, amount))
+  }
+  const deal = () => {
+    const timeouts = []
+    for (let i = 0; i < 4; i++) {
+      const t = setTimeout(() => play('cardDeal'), i * 120)
+      timeouts.push(t)
+    }
+    setGame((g) => startHand(g))
+    return () => timeouts.forEach((t) => clearTimeout(t))
+  }
   const restart = () => setGame(newPokerGame(1000, 1000))
 
   const board = []
