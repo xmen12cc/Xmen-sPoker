@@ -10,6 +10,7 @@ export default function Blackjack({ onBack }) {
 
   const playerTotal = handValue(game.player).total
   const dealerTotal = handValue(game.dealer).total
+  const dealerShown = game.phase === 'playing' ? handValue(game.dealer.slice(0, 1)).total : dealerTotal
   const playerCards = game.player
   const dealerCards = game.dealer
 
@@ -54,7 +55,7 @@ export default function Blackjack({ onBack }) {
       </div>
 
       <div className="bj-dealer">
-        <div className="bj-label">Dealer {dealerTotal}</div>
+        <div className="bj-label">Dealer {dealerShown}</div>
         <div className="bj-hand">
           {dealerCards.length > 0 ? (
             dealerCards.map((card, index) => (
@@ -128,12 +129,18 @@ export default function Blackjack({ onBack }) {
         )}
       </div>
 
-      {game.phase === 'done' && game.bankroll > 0 && (
+      {game.phase === 'done' && (
         <div className={`banner ${game.result}`} style={{ animation: 'fadein 0.4s ease' }}>
           {game.message}
           {(game.result === 'win' || game.result === 'blackjack') && game.payout > 0 && (
-            <span style={{ color: '#ffd700' }}> (+' + (game.payout - game.bet) + ')</span>
+            <span style={{ color: '#ffd700' }}> (+${game.payout - game.bet})</span>
           )}
+        </div>
+      )}
+      {game.phase === 'done' && game.bankroll <= 0 && (
+        <div className="out-of-chips" style={{ textAlign: 'center', color: '#fff', marginTop: '12px', fontSize: '14px' }}>
+          You are out of chips!
+          <button onClick={() => setGame(newGame(1000))}>New Game</button>
         </div>
       )}
     </div>
