@@ -12,6 +12,8 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   user-select: none;
   position: relative;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .card.red { color: #d00; }
@@ -19,6 +21,10 @@
 
 .card .suit { font-size: 32px; }
 .card .rank { font-size: 24px; }
+
+.card-empty { opacity: 0.25; background: #1d1d1d; border: 2px dashed rgba(255,255,255,0.3); box-shadow: none; }
+.card-back { background: repeating-linear-gradient(45deg, #7a1620, #7a1620 6px, #9b2230 6px, #9b2230 12px); border: 3px solid #f5f1e0; }
+.card-back-label { font-size: 11px; color: #f5f1e0; letter-spacing: 1px; }
 
 .hand {
   display: flex;
