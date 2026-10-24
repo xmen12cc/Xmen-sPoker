@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { newGame, startRound, hit, stand, doubleDown, nextRound, handValue } from '../engine/blackjack.js'
 import PlayingCard from './PlayingCard.jsx'
 import Chip from './Chip.jsx'
+import Dealer from './Dealer.jsx'
 import { play } from '../audio/sound.js'
 import './blackjack.css'
 
@@ -9,6 +10,7 @@ export default function Blackjack({ onBack }) {
   const [game, setGame] = useState(() => newGame(1000))
   const [pendingBet, setPendingBet] = useState(0)
   const [round, setRound] = useState(0)
+  const [dealerDealing, setDealerDealing] = useState(false)
 
   const playerTotal = handValue(game.player).total
   const dealerTotal = handValue(game.dealer).total
@@ -36,6 +38,7 @@ export default function Blackjack({ onBack }) {
       play('bet')
       setGame(startRound(game, pendingBet))
       setPendingBet(0)
+      setDealerDealing(true)
       setTimeout(() => play('cardDeal'), 0)
       setTimeout(() => play('cardDeal'), 150)
       setTimeout(() => play('cardDeal'), 300)
@@ -46,15 +49,18 @@ export default function Blackjack({ onBack }) {
   const handleHit = () => {
     setGame(hit(game))
     play('cardDeal')
+    setDealerDealing(true)
   }
   const handleStand = () => {
     setGame(stand(game))
     play('cardFlip')
+    setDealerDealing(true)
   }
   const handleDouble = () => {
     if (game.player.length === 2 && game.bankroll >= game.bet) {
       play('bet')
       setGame(doubleDown(game))
+      setDealerDealing(true)
       setTimeout(() => play('cardDeal'), 0)
     }
   }
@@ -73,6 +79,23 @@ export default function Blackjack({ onBack }) {
     return () => clearTimeout(timeout)
   }, [game.phase, game.result, round])
 
+  useEffect(() => {
+    if (dealerDealing) {
+      const timeout = setTimeout(() => setDealerDealing(false), 700)
+      return () => clearTimeout(timeout)
+    }
+  }, [dealerDealing])
+
+  const mood = game.phase === 'done'
+    ? game.result === 'win' || game.result === 'blackjack'
+      ? 'sad'
+      : game.result === 'lose'
+      ? 'happy'
+      : 'idle'
+    : dealerDealing
+    ? 'dealing'
+    : 'idle'
+
   return (
     <div className="bj-table">
       <div className="bj-header">
@@ -87,6 +110,9 @@ export default function Blackjack({ onBack }) {
       </div>
 
       <div className="bj-dealer">
+        <div className="bj-dealer-figure">
+          <Dealer key={mood + '-' + round} mood={mood} size={110} />
+        </div>
         <div className="bj-label">Dealer {dealerShown}</div>
         <div className="bj-hand">
           {dealerCards.length > 0 ? (

@@ -52,6 +52,18 @@
   text-align: center;
 }
 
+.bj-dealer-figure {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 600px) {
+  .bj-dealer-figure {
+    margin-bottom: 2px;
+  }
+}
+
 .bj-label {
   font-size: 14px;
   color: #aaa;
