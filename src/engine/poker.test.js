@@ -189,3 +189,138 @@ describe('actions', () => {
     expect(JSON.stringify(s)).toBe(before);
   });
 });
+
+describe('showdown', () => {
+  const c = (rank, suit) => ({ rank, suit, id: rank + suit });
+  const total = (s) => s.player.chips + s.casino.chips + s.pot;
+  function checkDown(s) {
+    let guard = 0;
+    while (s.toAct && guard++ < 50) {
+      const la = legalActions(s);
+      s = applyAction(s, la.actions.includes('check') ? 'check' : 'call');
+    }
+    return s;
+  }
+  function rigged(playerHole, casinoHole, board) {
+    const s = startHand(newPokerGame(), mulberry32(1));
+    return { ...s, player: { ...s.player, hole: playerHole }, casino: { ...s.casino, hole: casinoHole }, deck: board };
+  }
+
+  it('player wins: player holds A♠ A♥ against K♠ K♥ on board [2♣ 7♦ 9♥ J♠ 3♦] (high card 9)', () => {
+    const s = checkDown(rigged([c('A', 'S'), c('A', 'H')], [c('K', 'S'), c('K', 'H')], [c('2', 'C'), c('7', 'D'), c('9', 'H'), c('J', 'S'), c('3', 'D')]));
+    expect(s.street).toBe('done');
+    expect(s.winner).toBe('player');
+    expect(s.community.length).toBe(5);
+    expect(s.player.chips).toBe(1020);
+    expect(s.casino.chips).toBe(980);
+    expect(s.pot).toBe(0);
+    expect(s.showdown).not.toBeNull();
+    expect(s.showdown.amount).toBe(40);
+  });
+
+  it('casino wins: player holds K K against A A on the same board', () => {
+    const s = checkDown(rigged([c('K', 'S'), c('K', 'H')], [c('A', 'S'), c('A', 'H')], [c('2', 'C'), c('7', 'D'), c('9', 'H'), c('J', 'S'), c('3', 'D')]));
+    expect(s.street).toBe('done');
+    expect(s.winner).toBe('casino');
+    expect(s.player.chips).toBe(980);
+    expect(s.casino.chips).toBe(1020);
+    expect(s.pot).toBe(0);
+  });
+
+  it('tie: both hold 2♣ 3♦ against board [A♠ K♠ Q♠ J♠ 10♠] (royal flush)', () => {
+    const s = checkDown(rigged([c('2', 'C'), c('3', 'D')], [c('2', 'H'), c('3', 'S')], [c('A', 'S'), c('K', 'S'), c('Q', 'S'), c('J', 'S'), c('10', 'S')]));
+    expect(s.street).toBe('done');
+    expect(s.winner).toBe('tie');
+    expect(s.player.chips).toBe(1000);
+    expect(s.casino.chips).toBe(1000);
+  });
+
+  it('chip conservation: total of startHand is 2000 and remains 2000 after checkDown', () => {
+    const s0 = startHand(newPokerGame(), mulberry32(3));
+    expect(total(s0)).toBe(2000);
+    const s = checkDown(s0);
+    expect(total(s)).toBe(2000);
+  });
+
+  it('all-in call: player raises all-in and casino calls', () => {
+    const s0 = startHand(newPokerGame(), mulberry32(5));
+    const a = applyAction(s0, 'raise', 1000);
+    expect(a.player.allIn).toBe(true);
+    const b = applyAction(a, 'call');
+    expect(b.street).toBe('done');
+    expect(b.community.length).toBe(5);
+    expect(b.pot).toBe(0);
+    expect(b.player.chips + b.casino.chips).toBe(2000);
+  });
+
+  it('all-in fold: casino folds to player all-in raise', () => {
+    const s0 = startHand(newPokerGame(), mulberry32(5));
+    const a = applyAction(s0, 'raise', 1000);
+    const b = applyAction(a, 'fold');
+    expect(b.street).toBe('done');
+    expect(b.winner).toBe('player');
+    expect(b.player.chips).toBe(1020);
+    expect(b.casino.chips).toBe(980);
+    expect(b.player.chips + b.casino.chips).toBe(2000);
+  });
+
+  it('uncalled bet refund: casino is short and player gets refund', () => {
+    const s0 = startHand(newPokerGame(1000, 100), mulberry32(5));
+    const a = applyAction(s0, 'raise', 1000);
+    expect(a.toAct).toBe('casino');
+    const b = applyAction(a, 'call');
+    expect(b.street).toBe('done');
+    expect(b.player.chips + b.casino.chips).toBe(1100);
+    expect(b.pot).toBe(0);
+  });
+
+  it('heads-up first-to-act postflop: after player call and casino check, toAct is casino (the non-button)', () => {
+    const s = applyAction(applyAction(startHand(newPokerGame(), mulberry32(1)), 'call'), 'check');
+    expect(s.street).toBe('flop');
+    const casinoIsNonButton = s.toAct === 'casino';
+    expect(casinoIsNonButton).toBe(true);
+  });
+
+  it('street progression: after player call, casino check (flop), then casino check and player check -> turn, then both check -> river, then both check -> done', () => {
+    let s = startHand(newPokerGame(), mulberry32(1));
+    s = applyAction(s, 'call');
+    expect(s.street).toBe('preflop');
+    expect(s.community.length).toBe(0);
+
+    s = applyAction(s, 'check');
+    expect(s.street).toBe('flop');
+    expect(s.community.length).toBe(3);
+    expect(s.toAct).toBe('casino');
+
+    s = applyAction(s, 'check');
+    expect(s.street).toBe('flop');
+    expect(s.community.length).toBe(3);
+
+    s = applyAction(s, 'check');
+    expect(s.street).toBe('turn');
+    expect(s.community.length).toBe(4);
+
+    s = applyAction(s, 'check');
+    expect(s.street).toBe('turn');
+    expect(s.community.length).toBe(4);
+
+    s = applyAction(s, 'check');
+    expect(s.street).toBe('river');
+    expect(s.community.length).toBe(5);
+
+    s = applyAction(s, 'check');
+    expect(s.street).toBe('river');
+    expect(s.community.length).toBe(5);
+
+    s = applyAction(s, 'check');
+    expect(s.street).toBe('done');
+    expect(s.community.length).toBe(5);
+  });
+
+  it('raise cannot be made over an all-in opponent', () => {
+    const s0 = startHand(newPokerGame(), mulberry32(5));
+    const a = applyAction(s0, 'raise', 1000);
+    const la = legalActions(a);
+    expect(la.actions).not.toContain('raise');
+  });
+});
