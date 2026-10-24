@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { newGame, startRound, hit, stand, doubleDown, nextRound, handValue } from '../engine/blackjack.js'
 import PlayingCard from './PlayingCard.jsx'
 import Chip from './Chip.jsx'
+import { play } from '../audio/sound.js'
 import './blackjack.css'
 
 export default function Blackjack({ onBack }) {
@@ -21,23 +22,40 @@ export default function Blackjack({ onBack }) {
   const handleChipClick = (value) => {
     if (pendingBet + value <= game.bankroll) {
       setPendingBet(pendingBet + value)
+      play('chip')
     }
   }
 
-  const handleClear = () => setPendingBet(0)
+  const handleClear = () => {
+    setPendingBet(0)
+    play('button')
+  }
 
   const handleDeal = () => {
     if (pendingBet > 0) {
+      play('bet')
       setGame(startRound(game, pendingBet))
       setPendingBet(0)
+      setTimeout(() => play('cardDeal'), 0)
+      setTimeout(() => play('cardDeal'), 150)
+      setTimeout(() => play('cardDeal'), 300)
+      setTimeout(() => play('cardDeal'), 450)
     }
   }
 
-  const handleHit = () => setGame(hit(game))
-  const handleStand = () => setGame(stand(game))
+  const handleHit = () => {
+    setGame(hit(game))
+    play('cardDeal')
+  }
+  const handleStand = () => {
+    setGame(stand(game))
+    play('cardFlip')
+  }
   const handleDouble = () => {
     if (game.player.length === 2 && game.bankroll >= game.bet) {
+      play('bet')
       setGame(doubleDown(game))
+      setTimeout(() => play('cardDeal'), 0)
     }
   }
 
@@ -45,7 +63,15 @@ export default function Blackjack({ onBack }) {
     setRound(r => r + 1)
     setGame(nextRound(game))
     setPendingBet(0)
+    play('button')
   }
+
+  useEffect(() => {
+    if (game.phase !== 'done' || !game.result) return undefined
+    const name = game.result === 'win' || game.result === 'blackjack' ? 'win' : game.result === 'lose' ? 'lose' : 'push'
+    const timeout = setTimeout(() => play(name), 500)
+    return () => clearTimeout(timeout)
+  }, [game.phase, game.result, round])
 
   return (
     <div className="bj-table">
