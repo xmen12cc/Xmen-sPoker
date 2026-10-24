@@ -7,6 +7,7 @@ import './blackjack.css'
 export default function Blackjack({ onBack }) {
   const [game, setGame] = useState(() => newGame(1000))
   const [pendingBet, setPendingBet] = useState(0)
+  const [round, setRound] = useState(0)
 
   const playerTotal = handValue(game.player).total
   const dealerTotal = handValue(game.dealer).total
@@ -40,7 +41,11 @@ export default function Blackjack({ onBack }) {
     }
   }
 
-  const handleNext = () => setGame(nextRound(game))
+  const handleNext = () => {
+    setRound(r => r + 1)
+    setGame(nextRound(game))
+    setPendingBet(0)
+  }
 
   return (
     <div className="bj-table">
@@ -61,7 +66,7 @@ export default function Blackjack({ onBack }) {
           {dealerCards.length > 0 ? (
             dealerCards.map((card, index) => (
               <PlayingCard
-                key={card.id + index}
+                key={card.id + index + round}
                 card={card}
                 faceDown={game.phase === 'playing' && index === 1}
                 delay={index * 150}
@@ -73,13 +78,13 @@ export default function Blackjack({ onBack }) {
         </div>
       </div>
 
-      <div className="bj-hand">
+      <div className="bj-player">
         <div className="bj-label">You {playerTotal}</div>
         <div className="bj-hand">
           {playerCards.length > 0 ? (
             playerCards.map((card, index) => (
               <PlayingCard
-                key={card.id + index}
+                key={card.id + index + round}
                 card={card}
                 delay={index * 150}
               />

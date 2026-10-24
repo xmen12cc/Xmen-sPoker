@@ -58,6 +58,15 @@
   margin-bottom: 8px;
 }
 
+.bj-player {
+  text-align: center;
+}
+
+.bj-player .bj-label {
+  display: block;
+  margin-bottom: 8px;
+}
+
 .bj-hand {
   display: flex;
   gap: 8px;
