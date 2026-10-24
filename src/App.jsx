@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Blackjack from './components/Blackjack.jsx'
 
 const App = () => {
   const [view, setView] = useState('lobby')
@@ -13,11 +14,7 @@ const App = () => {
         </div>
       )}
       {view === 'blackjack' && (
-        <div className="view">
-          <h2>Blackjack</h2>
-          <p>Coming soon</p>
-          <button onClick={() => setView('lobby')}>Back to Lobby</button>
-        </div>
+        <Blackjack onBack={() => setView('lobby')} />
       )}
       {view === 'poker' && (
         <div className="view">

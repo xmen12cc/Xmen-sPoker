@@ -1,0 +1,53 @@
+.card {
+  width: 70px;
+  height: 100px;
+  background: #fff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+  font-size: 28px;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  user-select: none;
+  position: relative;
+}
+
+.card.red { color: #d00; }
+.card.black { color: #111; }
+
+.card .suit { font-size: 32px; }
+.card .rank { font-size: 24px; }
+
+.hand {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 280px;
+}
+
+.chip {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  border: 3px dashed rgba(255,255,255,0.6);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  user-select: none;
+}
+
+.chip:active { transform: scale(0.95); }
+.chip:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.chip[data-value="5"] { background: #e67e22; }
+.chip[data-value="25"] { background: #27ae60; }
+.chip[data-value="100"] { background: #8e44ad; }
+.chip[data-value="500"] { background: #c0392b; }
