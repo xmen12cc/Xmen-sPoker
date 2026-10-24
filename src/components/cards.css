@@ -26,6 +26,26 @@
 .card-back { background: repeating-linear-gradient(45deg, #7a1620, #7a1620 6px, #9b2230 6px, #9b2230 12px); border: 3px solid #f5f1e0; }
 .card-back-label { font-size: 11px; color: #f5f1e0; letter-spacing: 1px; }
 
+@keyframes dealin {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.card {
+  animation: dealin 0.35s ease-out both;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  transition: transform 0.15s;
+}
+
 .hand {
   display: flex;
   gap: 8px;
@@ -57,3 +77,18 @@
 .chip[data-value="25"] { background: #27ae60; }
 .chip[data-value="100"] { background: #8e44ad; }
 .chip[data-value="500"] { background: #c0392b; }
+
+@media (max-width: 600px) {
+  .card {
+    width: 52px;
+    height: 76px;
+  }
+
+  .card .rank {
+    font-size: 18px;
+  }
+
+  .card .suit {
+    font-size: 22px;
+  }
+}

@@ -18,3 +18,24 @@
 .pk-controls { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; min-height: 48px; }
 .pk-btn { padding: 10px 18px; font-size: 16px; }
 .pk-over { display: flex; gap: 12px; align-items: center; font-size: 20px; }
+
+@media (max-width: 600px) {
+  .pk-table {
+    padding: 8px;
+  }
+
+  .pk-btn {
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+
+  .pk-name {
+    font-size: 14px;
+  }
+
+  .pk-board,
+  .pk-dealer,
+  .pk-player {
+    flex-wrap: wrap;
+  }
+}
