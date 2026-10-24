@@ -108,10 +108,74 @@ export function playButton() {
     tone(880, 0.05);
 }
 
+export function playCardFlip() {
+    noise(0.05, { filterFreq: 5000, filterType: 'bandpass', volume: 0.1 });
+}
+
+export function playBet() {
+    tone(2200, 0.04, { type: 'square', volume: 0.07, delay: 0 });
+    tone(2600, 0.04, { type: 'square', volume: 0.07, delay: 0.05 });
+    tone(3000, 0.04, { type: 'square', volume: 0.07, delay: 0.1 });
+    noise(0.04, { filterFreq: 200, filterType: 'lowpass', volume: 0.05, delay: 0.15 });
+}
+
+export function playFold() {
+    tone(300, 0.25, { type: 'sawtooth', volume: 0.1, slideTo: 120 });
+}
+
+export function playCheck() {
+    tone(180, 0.08, { type: 'sine', volume: 0.2 });
+}
+
+export function playWin() {
+    tone(523, 0.14, { type: 'triangle', volume: 0.15, delay: 0 });
+    tone(659, 0.14, { type: 'triangle', volume: 0.15, delay: 0.12 });
+    tone(784, 0.14, { type: 'triangle', volume: 0.15, delay: 0.24 });
+    tone(1047, 0.3, { type: 'triangle', volume: 0.15, delay: 0.36 });
+}
+
+export function playLose() {
+    tone(330, 0.25, { type: 'sawtooth', volume: 0.1, delay: 0 });
+    tone(247, 0.25, { type: 'sawtooth', volume: 0.1, delay: 0.22 });
+}
+
+export function playPush() {
+    tone(440, 0.15, { type: 'sine', volume: 0.12, delay: 0 });
+    tone(440, 0.15, { type: 'sine', volume: 0.12, delay: 0.2 });
+}
+
+export function playTick() {
+    tone(1800, 0.015, { type: 'square', volume: 0.06 });
+}
+
+export function playSpin() {
+    noise(1.0, { filterFreq: 600, filterType: 'bandpass', volume: 0.1 });
+    tone(120, 1.0, { type: 'sine', volume: 0.05, slideTo: 500 });
+}
+
+export function playBallDrop() {
+    tone(1500, 0.02, { type: 'square', volume: 0.07, delay: 0 });
+    tone(1600, 0.02, { type: 'square', volume: 0.07, delay: 0.055 });
+    tone(1700, 0.02, { type: 'square', volume: 0.07, delay: 0.115 });
+    tone(1800, 0.02, { type: 'square', volume: 0.07, delay: 0.205 });
+    tone(1900, 0.02, { type: 'square', volume: 0.07, delay: 0.335 });
+    tone(2000, 0.02, { type: 'square', volume: 0.07, delay: 0.535 });
+}
+
 export const EFFECTS = {
     cardDeal: playCardDeal,
     chip: playChip,
-    button: playButton
+    button: playButton,
+    cardFlip: playCardFlip,
+    bet: playBet,
+    fold: playFold,
+    check: playCheck,
+    win: playWin,
+    lose: playLose,
+    push: playPush,
+    tick: playTick,
+    spin: playSpin,
+    ballDrop: playBallDrop,
 };
 
 export function play(name) {
@@ -124,3 +188,5 @@ export function play(name) {
         // ignore
     }
 }
+
+export const SOUND_NAMES = Object.keys(EFFECTS);
