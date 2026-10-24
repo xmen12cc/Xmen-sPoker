@@ -141,3 +141,74 @@ export function startRound(state, bet) {
 
   return newState;
 }
+
+export function hit(state) {
+  if (state.phase !== 'playing') {
+    throw new Error('Not playing');
+  }
+  const d = draw(state.shoe);
+  const next = {
+    ...state,
+    shoe: d.deck,
+    player: [...state.player, d.card],
+  };
+  if (isBust(next.player)) {
+    return settle(next);
+  }
+  if (handValue(next.player).total === 21) {
+    return stand(next);
+  }
+  return next;
+}
+
+export function stand(state) {
+  if (state.phase !== 'playing') {
+    throw new Error('Not playing');
+  }
+  let s = { ...state };
+  while (handValue(s.dealer).total < 17) {
+    const d = draw(s.shoe);
+    s = {
+      ...s,
+      shoe: d.deck,
+      dealer: [...s.dealer, d.card],
+    };
+  }
+  return settle(s);
+}
+
+export function doubleDown(state) {
+  if (state.phase !== 'playing' || state.player.length !== 2 || state.bankroll < state.bet) {
+    throw new Error('Cannot double');
+  }
+  const d = draw(state.shoe);
+  const next = {
+    ...state,
+    shoe: d.deck,
+    bankroll: state.bankroll - state.bet,
+    bet: state.bet * 2,
+    doubled: true,
+    player: [...state.player, d.card],
+  };
+  if (isBust(next.player)) {
+    return settle(next);
+  }
+  return stand(next);
+}
+
+export function nextRound(state) {
+  if (state.phase !== 'done') {
+    throw new Error('Round not finished');
+  }
+  return {
+    ...state,
+    player: [],
+    dealer: [],
+    bet: 0,
+    phase: 'betting',
+    doubled: false,
+    result: null,
+    payout: 0,
+    message: '',
+  };
+}
