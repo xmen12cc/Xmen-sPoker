@@ -3,6 +3,7 @@ import { newPokerGame, startHand, applyAction, legalActions } from '../engine/po
 import { playCasinoTurn } from '../engine/pokerAI.js'
 import { play } from '../audio/sound.js'
 import PlayingCard from './PlayingCard.jsx'
+import Dealer from './Dealer.jsx'
 import './poker.css'
 
 export default function Poker({ onBack }) {
@@ -20,6 +21,14 @@ export default function Poker({ onBack }) {
   const gameOver = game.street === 'done' && (game.player.chips <= 0 || game.casino.chips <= 0)
   const canRaise = la.actions.includes('raise')
   const canCheck = la.actions.includes('check')
+  const mood =
+    game.street === 'preflop' && game.acted.player === false && game.acted.casino === false
+      ? 'dealing'
+    : game.street === 'done' && game.winner === 'casino'
+      ? 'happy'
+    : game.street === 'done' && game.winner === 'player'
+      ? 'sad'
+    : 'idle'
 
   useEffect(() => {
     if (!casinoTurn) return undefined
@@ -123,6 +132,10 @@ export default function Poker({ onBack }) {
           )}
         </div>
         {casinoTurn && <div className="pk-thinking">Casino is thinking...</div>}
+      </div>
+
+      <div className="pk-dealer-wrap">
+        <Dealer mood={mood} size={110} key={mood + '-' + game.handNumber} />
       </div>
 
       <div className="pk-board">
