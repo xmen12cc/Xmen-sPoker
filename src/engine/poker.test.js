@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { newPokerGame, startHand, postBlind, other, SMALL_BLIND, BIG_BLIND } from './poker.js';
+import { newPokerGame, startHand, postBlind, other, SMALL_BLIND, BIG_BLIND, applyAction, legalActions } from './poker.js';
 
 function mulberry32(a) {
   return function () {
@@ -109,5 +109,83 @@ describe('postBlind', () => {
     expect(result.bet).toBe(10);
     expect(result.totalBet).toBe(10);
     expect(result.allIn).toBe(false);
+  });
+});
+
+describe('actions', () => {
+  const start = () => startHand(newPokerGame(), mulberry32(1));
+
+  it('legalActions(start()): actions equal ["fold","call","raise"], toCall 10, minRaiseTo 40, maxRaiseTo 1000', () => {
+    const s = start();
+    const { actions, toCall, minRaiseTo, maxRaiseTo } = legalActions(s);
+    expect(actions).toEqual(['fold', 'call', 'raise']);
+    expect(toCall).toBe(10);
+    expect(minRaiseTo).toBe(40);
+    expect(maxRaiseTo).toBe(1000);
+  });
+
+  it('fold: s = applyAction(start(), "fold"): s.street "done", s.winner "casino", s.pot 0, s.player.chips 990, s.casino.chips 1010, s.toAct null', () => {
+    const s = applyAction(start(), 'fold');
+    expect(s.street).toBe('done');
+    expect(s.winner).toBe('casino');
+    expect(s.pot).toBe(0);
+    expect(s.player.chips).toBe(990);
+    expect(s.casino.chips).toBe(1010);
+    expect(s.toAct).toBe(null);
+  });
+
+  it('call then check: a = applyAction(start(), "call"); expect a.toAct "casino", a.street "preflop", a.player.bet 20; b = applyAction(a, "check"); expect b.street "flop", b.community.length 3, b.toAct "casino", b.player.bet 0, b.casino.bet 0, b.pot 40, b.currentBet 0', () => {
+    const a = applyAction(start(), 'call');
+    expect(a.toAct).toBe('casino');
+    expect(a.street).toBe('preflop');
+    expect(a.player.bet).toBe(20);
+    const b = applyAction(a, 'check');
+    expect(b.street).toBe('flop');
+    expect(b.community.length).toBe(3);
+    expect(b.toAct).toBe('casino');
+    expect(b.player.bet).toBe(0);
+    expect(b.casino.bet).toBe(0);
+    expect(b.pot).toBe(40);
+    expect(b.currentBet).toBe(0);
+  });
+
+  it('raise: r = applyAction(start(), "raise", 60); expect r.player.bet 60, r.player.chips 940, r.currentBet 60, r.minRaise 40, r.toAct "casino"; c = applyAction(r, "call"); expect c.street "flop", c.pot 120, c.casino.chips 940', () => {
+    const r = applyAction(start(), 'raise', 60);
+    expect(r.player.bet).toBe(60);
+    expect(r.player.chips).toBe(940);
+    expect(r.currentBet).toBe(60);
+    expect(r.minRaise).toBe(40);
+    expect(r.toAct).toBe('casino');
+    const c = applyAction(r, 'call');
+    expect(c.street).toBe('flop');
+    expect(c.pot).toBe(120);
+    expect(c.casino.chips).toBe(940);
+  });
+
+  it('raise too small: expect(() => applyAction(start(), "raise", 25)).toThrow()', () => {
+    expect(() => applyAction(start(), 'raise', 25)).toThrow();
+  });
+
+  it('check while owing: expect(() => applyAction(start(), "check")).toThrow()', () => {
+    expect(() => applyAction(start(), 'check')).toThrow();
+  });
+
+  it('re-raise: r = applyAction(start(),"raise",60); rr = applyAction(r,"raise",140); expect rr.currentBet 140, rr.toAct "player", rr.minRaise 80', () => {
+    const r = applyAction(start(), 'raise', 60);
+    const rr = applyAction(r, 'raise', 140);
+    expect(rr.currentBet).toBe(140);
+    expect(rr.toAct).toBe('player');
+    expect(rr.minRaise).toBe(80);
+  });
+
+  it('acting after the hand ends throws: expect(() => applyAction(applyAction(start(), "fold"), "check")).toThrow()', () => {
+    expect(() => applyAction(applyAction(start(), 'fold'), 'check')).toThrow();
+  });
+
+  it('immutability: JSON.stringify of start() before and after applyAction(s,"call") is unchanged', () => {
+    const s = start();
+    const before = JSON.stringify(s);
+    applyAction(s, 'call');
+    expect(JSON.stringify(s)).toBe(before);
   });
 });
