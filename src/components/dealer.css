@@ -1,1 +1,156 @@
-/* placeholder for dealer.css - CSS will be added in next task */
+/* Dealer animations - T16b */
+
+.dealer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,0.4));
+}
+
+/* Base SVG elements need transform-box and transform-origin */
+.dealer-body,
+.dealer-eyes,
+.dealer-arm-left,
+.dealer-arm-right,
+.dealer-card {
+  transform-box: fill-box;
+}
+
+/* Breathe animation - applies to .dealer-body in all moods */
+@keyframes dealer-breathe {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-1.5px) scale(1.02);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dealer-body {
+  animation: dealer-breathe 4s ease-in-out infinite;
+}
+
+/* Blink animation - applies to .dealer-eyes */
+@keyframes dealer-blink {
+  0% {
+    transform: scaleY(1);
+  }
+  90% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+.dealer-eyes {
+  animation: dealer-blink 5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Dealing mood animations */
+.dealer-dealing .dealer-arm-right {
+  animation: dealer-toss 0.6s ease-in-out infinite;
+  transform-origin: 0% 0%;
+}
+
+@keyframes dealer-toss {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-35deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.dealer-dealing .dealer-card {
+  animation: dealer-card-fly 0.6s ease-out forwards;
+}
+
+@keyframes dealer-card-fly {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(40px) rotate(20deg);
+    opacity: 0;
+  }
+}
+
+/* Happy mood */
+.dealer-happy .dealer-body {
+  animation: dealer-bounce 0.5s ease-in-out 3;
+}
+
+@keyframes dealer-bounce {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.dealer-happy .dealer-arm-left {
+  animation: dealer-arm-left-move 0.4s ease-in-out forwards;
+  transform-origin: 0% 0%;
+}
+
+@keyframes dealer-arm-left-move {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(25deg);
+  }
+}
+
+.dealer-happy .dealer-arm-right {
+  animation: dealer-arm-right-move 0.4s ease-in-out forwards;
+  transform-origin: 0% 0%;
+}
+
+@keyframes dealer-arm-right-move {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-25deg);
+  }
+}
+
+/* Sad mood */
+.dealer-sad .dealer-body {
+  animation: dealer-droop 1.2s ease-out forwards;
+}
+
+@keyframes dealer-droop {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(4px) rotate(-4deg);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .dealer *,
+  .dealer {
+    animation: none !important;
+    transition: none !important;
+  }
+}
