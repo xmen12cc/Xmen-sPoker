@@ -1,0 +1,83 @@
+:root {
+  --felt: #0b3d2e;
+  --gold: #d4af37;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, serif;
+  color: #f5f1e0;
+  background: radial-gradient(circle at center, var(--felt), #06231a);
+  min-height: 100vh;
+}
+
+.app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.lobby {
+  text-align: center;
+}
+
+.lobby h1 {
+  font-size: 3rem;
+  color: var(--gold);
+  margin-bottom: 2rem;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.lobby button {
+  display: block;
+  margin: 0.5rem auto;
+  padding: 0.75rem 2rem;
+  font-size: 1.2rem;
+  font-family: Georgia, serif;
+  color: var(--gold);
+  background: rgba(212, 175, 55, 0.1);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lobby button:hover {
+  background: var(--gold);
+  color: #0b3d2e;
+  box-shadow: 0 0 20px var(--gold);
+}
+
+.view {
+  text-align: center;
+}
+
+.view h2 {
+  color: var(--gold);
+  font-size: 2rem;
+}
+
+.view p {
+  color: #aaa;
+  font-size: 1.2rem;
+}
+
+.view button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-family: Georgia, serif;
+  color: var(--gold);
+  background: rgba(212, 175, 55, 0.1);
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view button:hover {
+  background: var(--gold);
+  color: #0b3d2e;
+  box-shadow: 0 0 15px var(--gold);
+}
