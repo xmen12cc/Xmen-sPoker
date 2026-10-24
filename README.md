@@ -2,6 +2,21 @@
 
 A Vite + React casino game application featuring Blackjack and Texas Hold'em.
 
+## Quick Start
+
+**Requirements:** Node.js 18 or newer and npm
+
+1. Clone or open the project folder
+2. Run `npm install`
+3. Run `npm run dev`
+4. Open the printed local URL (usually http://localhost:5173) in a browser
+
+## Other commands
+
+- `npm test` — runs the unit tests
+- `npm run build` — production build into dist/
+- `npm run preview` — serve the production build locally
+
 ## Features
 
 **Blackjack:**
@@ -22,13 +37,18 @@ A Vite + React casino game application featuring Blackjack and Texas Hold'em.
 
 **Texas Hold'em:** Use your 2 hole cards combined with 5 community cards to make the best 5-card hand.
 
+## How to Play
+
+- **Blackjack** — pick chips then press Deal, use Hit/Stand/Double, press Next Hand
+- **Texas Hold'em** — the casino acts automatically after you, use the raise slider or all-in, the casino's cards are revealed at showdown; if you run out of chips press New Game
+
 ## Project Structure
 
 - `src/engine/`: Core game logic
   - `cards.js`: Deck creation, shuffling, card utilities
   - `blackjack.js`: Blackjack game rules and state machine
-- `poker.js`: Heads-up Texas Hold'em state machine (blinds, betting rounds, showdown)
-- `pokerEval.js`: 5-card and best-of-7 hand ranking and comparison
+  - `poker.js`: Heads-up Texas Hold'em state machine (blinds, betting rounds, showdown)
+  - `pokerEval.js`: 5-card and best-of-7 hand ranking and comparison
   - `pokerAI.js`: Casino AI decision logic
 - `src/components/`: React UI components
   - `Blackjack.jsx`: Blackjack game component
