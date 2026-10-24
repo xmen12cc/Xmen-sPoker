@@ -45,6 +45,7 @@ export default function Blackjack({ onBack }) {
   return (
     <div className="bj-table">
       <div className="bj-header">
+        <button onClick={onBack}>&lt; Back to Lobby</button>
         <h2>Blackjack</h2>
         <div className="bj-header-right">
           <span>Bankroll: ${game.bankroll}</span>
@@ -100,6 +101,7 @@ export default function Blackjack({ onBack }) {
               <Chip value={500} onClick={() => handleChipClick(500)} disabled={pendingBet + 500 > game.bankroll} />
             </div>
             <button className="bj-btn-clear" onClick={handleClear}>Clear</button>
+            <button className="bj-btn-clear" onClick={() => setPendingBet(game.bankroll)} disabled={game.bankroll <= 0}>All In</button>
             <button
               className="bj-btn-deal"
               onClick={handleDeal}
