@@ -24,23 +24,36 @@ A Vite + React casino game application featuring Blackjack and Texas Hold'em.
 - Hit, stand and double down actions
 - Blackjack pays 3:2
 - Dealer stands on 17
+- Animated dealer shown at the table
 
 **Texas Hold'em:**
 - Heads-up vs the casino AI
 - 10/20 blind structure
 - Fold, check, call, raise, and all-in actions
 - Showdown with best 5 of 7 cards
+- Animated dealer shown at the table
+
+**Roulette:**
+- European single-zero wheel with 37 pockets
+- Animated wheel and ball
+- Bets on straight numbers, red/black, odd/even, 1–18/19–36, dozens and columns
+- Payouts: straight 35:1, dozens and columns 2:1, even-money bets 1:1
+- Zero loses all outside bets
+- Start with a 1000 bankroll; choose a chip value, click the board to place bets, then spin
+
+**Audio:**
+- Synthesized sound effects (Web Audio API, no audio files)
+- Play card deals, chip sounds, button clicks, card flips, bets, folds, checks, wins, and losses
+- Mute button in the top-right corner
+- Mute state is remembered between visits
 
 ## How to Play
 
-**Blackjack:** Aim for 21 without busting. Beat the dealer's hand to win.
+**Blackjack** — pick chips then press Deal, use Hit/Stand/Double, press Next Hand.
 
-**Texas Hold'em:** Use your 2 hole cards combined with 5 community cards to make the best 5-card hand.
+**Texas Hold'em** — the casino acts automatically after you, use the raise slider or all-in, the casino's cards are revealed at showdown; if you run out of chips press New Game.
 
-## How to Play
-
-- **Blackjack** — pick chips then press Deal, use Hit/Stand/Double, press Next Hand
-- **Texas Hold'em** — the casino acts automatically after you, use the raise slider or all-in, the casino's cards are revealed at showdown; if you run out of chips press New Game
+**Roulette** — European single-zero wheel with 37 pockets. Place bets on straight numbers, red/black, odd/even, 1–18/19–36, dozens and columns. Payouts: straight 35:1, dozens and columns 2:1, even-money bets 1:1. The zero loses all outside bets. Start with a 1000 bankroll, choose a chip value, click the board to place bets, then press Spin.
 
 ## Project Structure
 
@@ -50,11 +63,21 @@ A Vite + React casino game application featuring Blackjack and Texas Hold'em.
   - `poker.js`: Heads-up Texas Hold'em state machine (blinds, betting rounds, showdown)
   - `pokerEval.js`: 5-card and best-of-7 hand ranking and comparison
   - `pokerAI.js`: Casino AI decision logic
+  - `roulette.js`: European roulette game rules and state machine
 - `src/components/`: React UI components
   - `Blackjack.jsx`: Blackjack game component
   - `Poker.jsx`: Texas Hold'em game component
+  - `Roulette.jsx`: Roulette game component
+  - `RouletteBoard.jsx`: Roulette betting board component
+  - `RouletteWheel.jsx`: Animated roulette wheel component
+  - `Dealer.jsx`: Animated dealer component
+  - `SoundToggle.jsx`: Mute/unmute toggle component
   - `PlayingCard.jsx`: Card rendering component
   - `Chip.jsx`: Chip betting component
+- `src/audio/`: Audio utilities
+  - `sound.js`: Web Audio API synthesizer (no audio files), mute toggle
+- `src/components/**/*.css`: Styling for all components
+- `src/engine/*.test.js`: Unit tests for game logic
 
 ## Scripts
 
