@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Blackjack from './components/Blackjack.jsx'
 import Poker from './components/Poker.jsx'
+import Roulette from './components/Roulette.jsx'
 import SoundToggle from './components/SoundToggle.jsx'
 
 const App = () => {
@@ -22,6 +23,10 @@ const App = () => {
               Texas Hold'em
               <span className="tile-sub">Heads-up vs the casino</span>
             </button>
+            <button className="game-tile" onClick={() => setView('roulette')}>
+              Roulette
+              <span className="tile-sub">Spin the wheel, place your bets</span>
+            </button>
           </div>
         </div>
       )}
@@ -30,6 +35,9 @@ const App = () => {
       )}
       {view === 'poker' && (
         <Poker onBack={() => setView('lobby')} />
+      )}
+      {view === 'roulette' && (
+        <Roulette onBack={() => setView('lobby')} />
       )}
     </div>
   )

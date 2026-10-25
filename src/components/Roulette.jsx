@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { newRouletteGame, placeBet, clearBets, resolveRound, nextRoulette, spin, colorOf } from '../engine/roulette.js';
 import RouletteBoard from './RouletteBoard.jsx';
 import RouletteWheel from './RouletteWheel.jsx';
 import Chip from './Chip.jsx';
+import { play } from '../audio/sound.js';
 import './roulette.css';
 
 const CHIP_VALUES = [5, 25, 100, 500];
@@ -14,18 +15,30 @@ function Roulette({ onBack }) {
   const [spinning, setSpinning] = useState(false);
   const [pendingNumber, setPendingNumber] = useState(null);
   const [error, setError] = useState('');
+  const soundTimeouts = useRef([]);
+
+  useEffect(() => {
+    return () => {
+      soundTimeouts.current.forEach((id) => clearTimeout(id));
+    };
+  }, []);
 
   const handleWheelDone = () => {
     if (!spinning) return;
     if (pendingNumber === null) return;
-    setGame((g) => resolveRound(g, pendingNumber));
+    const resolved = resolveRound(game, pendingNumber);
+    setGame(resolved);
     setSpinning(false);
+    if (resolved.lastNet > 0) play('win');
+    else if (resolved.lastNet < 0) play('lose');
+    else play('push');
   };
 
   const handleBet = (type, value) => {
     if (spinning) return;
     try {
       setGame(placeBet(game, type, value, chipValue));
+      play('chip');
       setError('');
     } catch (e) {
       setError(e.message);
@@ -38,13 +51,23 @@ function Roulette({ onBack }) {
     if (game.bets.length === 0) return;
     const n = spin();
     setPendingNumber(n);
+    play('spin');
+
     setSpinId(spinId + 1);
     setSpinning(true);
     setError('');
+
+    const tickDels = [0, 150, 320, 520, 760, 1040, 1360, 1720];
+    tickDels.forEach((d, i) => {
+      soundTimeouts.current.push(setTimeout(() => play('tick'), d));
+    });
+
+    soundTimeouts.current.push(setTimeout(() => play('ballDrop'), 3600));
   };
 
   const handleClearBets = () => {
     setGame(clearBets(game));
+    play('check');
     setError('');
   };
 
