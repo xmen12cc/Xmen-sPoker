@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
@@ -9,12 +10,15 @@
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.3);
   color: #fff;
+  box-sizing: border-box;
 }
 
 .bj-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(255,255,255,0.2);
 }
@@ -22,7 +26,8 @@
 .bj-header h2 {
   margin: 0;
   font-size: 24px;
-  color: #ffd700;
+  color: #d4af37;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
 }
 
 .bj-header-right {
@@ -48,6 +53,23 @@
 
 .bj-header-right button:hover { background: #a93226; }
 
+.bj-btn-back {
+  padding: 8px 16px;
+  background: transparent;
+  color: #d4af37;
+  border: 1px solid rgba(212, 175, 55, 0.6);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.15s, color 0.15s;
+}
+
+.bj-btn-back:hover {
+  background: #d4af37;
+  color: #14212e;
+}
+
 .bj-dealer {
   text-align: center;
 }
@@ -68,6 +90,11 @@
   font-size: 14px;
   color: #aaa;
   margin-bottom: 8px;
+}
+
+.bj-label.bust-total {
+  color: #ff6b6b;
+  font-weight: bold;
 }
 
 .bj-player {
@@ -92,7 +119,7 @@
   margin-bottom: 8px;
 }
 
-.bj-hand span {
+.bj-empty {
   color: #777;
   font-size: 14px;
 }
@@ -105,8 +132,8 @@
 }
 
 .bj-bet {
-  font-size: 18px;
-  color: #ffd700;
+  font-size: 16px;
+  color: #d4af37;
   font-weight: bold;
 }
 
@@ -135,14 +162,25 @@
 }
 
 .bj-btn-clear:hover { background: #555; }
+.bj-btn-clear:disabled { background: #444; color: #888; cursor: not-allowed; }
 
-.bj-btn-deal {
-  background: #e67e22;
-  color: #fff;
+.bj-btn-deal,
+.bj-btn-gold {
+  background: #d4af37;
+  color: #14212e;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.35);
 }
 
-.bj-btn-deal:hover { background: #d35400; }
-.bj-btn-deal:disabled { background: #555; color: #888; cursor: not-allowed; }
+.bj-btn-deal:hover,
+.bj-btn-gold:hover { background: #e6c35c; }
+
+.bj-btn-deal:disabled,
+.bj-btn-gold:disabled {
+  background: #555;
+  color: #888;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 
 .bj-controls {
   display: flex;
@@ -160,59 +198,122 @@
 .bj-controls .bj-btn:disabled { background: #555; color: #888; cursor: not-allowed; }
 
 .banner {
-  padding: 16px 24px;
-  border-radius: 8px;
+  padding: 14px 20px;
+  border-radius: 10px;
   text-align: center;
+  border: 2px solid transparent;
+  animation: banner-pop 0.35s ease both;
+}
+
+.banner-title {
+  display: block;
   font-size: 20px;
   font-weight: bold;
-  color: #ffd700;
-  animation: fadein 0.4s ease, scalein 0.4s ease 0.1s both;
 }
 
-@keyframes fadein {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.banner-net {
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: bold;
 }
 
-@keyframes scalein {
-  from { transform: scale(0.9); }
-  to { transform: scale(1); }
+@keyframes banner-pop {
+  0% { opacity: 0; transform: scale(0.85); }
+  60% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bust-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(231, 76, 60, 0); }
+  50% { box-shadow: 0 0 24px rgba(231, 76, 60, 0.55); }
 }
 
 .banner.win {
   background: rgba(39, 174, 96, 0.2);
-  border: 2px solid #27ae60;
-  box-shadow: 0 0 20px rgba(39, 174, 96, 0.3);
+  border-color: #27ae60;
 }
 
-.banner.win span {
-  color: #ffd700;
-}
+.banner.win .banner-net { color: #6ef2a6; }
 
 .banner.blackjack {
-  background: rgba(39, 174, 96, 0.25);
-  border: 2px solid #27ae60;
-  box-shadow: 0 0 30px rgba(39, 174, 96, 0.5), 0 0 60px rgba(39, 174, 96, 0.3);
+  background: rgba(212, 175, 55, 0.18);
+  border-color: #d4af37;
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.45), 0 0 60px rgba(212, 175, 55, 0.25);
 }
 
-.banner.lose {
-  background: rgba(231, 76, 60, 0.2);
-  border: 2px solid #e74c3c;
-}
+.banner.blackjack .banner-title { color: #ffd700; }
+.banner.blackjack .banner-net { color: #ffd700; }
 
 .banner.push {
   background: rgba(100, 100, 100, 0.2);
-  border: 2px solid #7f8c8d;
+  border-color: #7f8c8d;
 }
+
+.banner.push .banner-net { color: #ccc; }
+
+.banner.lose {
+  background: rgba(231, 76, 60, 0.2);
+  border-color: #e74c3c;
+}
+
+.banner.lose .banner-net { color: #ff9a8f; }
+
+.banner.bust {
+  background: rgba(192, 57, 43, 0.28);
+  border-color: #c0392b;
+  animation: banner-pop 0.35s ease both, bust-pulse 0.9s ease 0.35s 2;
+}
+
+.banner.bust .banner-title { color: #ff6b6b; }
+.banner.bust .banner-net { color: #ff9a8f; }
+
+@media (prefers-reduced-motion: reduce) {
+  .banner,
+  .banner.bust {
+    animation: none;
+  }
+}
+
+.out-of-chips {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #fff;
+}
+
+.out-of-chips button {
+  padding: 6px 16px;
+  background: #d4af37;
+  color: #14212e;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.out-of-chips button:hover { background: #e6c35c; }
 
 @media (max-width: 600px) {
   .bj-table {
-    padding: 8px;
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .bj-header h2 {
+    font-size: 20px;
   }
 
   .bj-controls .bj-btn,
   .bj-btn-clear,
-  .bj-btn-deal {
+  .bj-btn-deal,
+  .bj-btn-back {
     font-size: 14px;
     padding: 8px 14px;
   }
@@ -223,5 +324,18 @@
 
   .bj-chips {
     flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .bj-bet {
+    font-size: 15px;
+  }
+
+  .banner-title {
+    font-size: 17px;
+  }
+
+  .banner-net {
+    font-size: 14px;
   }
 }

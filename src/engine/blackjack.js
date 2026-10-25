@@ -44,6 +44,7 @@ export function canSplit(cards) {
 export function newGame(bankroll = 1000, rng = Math.random) {
   return {
     shoe: createShoe(6, rng),
+    rng,
     player: [],
     dealer: [],
     bet: 0,
@@ -97,33 +98,34 @@ export function settle(state) {
   return { ...state, phase: 'done', result: 'lose', payout: 0, message: 'Dealer wins', bankroll: state.bankroll };
 }
 
-export function startRound(state, bet) {
+export function startRound(state, bet, rng = state.rng || Math.random) {
   if (state.phase !== 'betting' || bet <= 0 || bet > state.bankroll) {
     throw new Error('Invalid bet');
   }
 
   let shoe = state.shoe;
-  if (state.shoe.length < 20) {
-    shoe = createShoe(6);
+  if (shoe.length < 20) {
+    shoe = createShoe(6, rng);
   }
 
-  const c1 = draw(shoe);
-  shoe = c1.deck;
-  const c2 = draw(shoe);
-  shoe = c2.deck;
-  const c3 = draw(shoe);
-  shoe = c3.deck;
-  const c4 = draw(shoe);
+  const dealt = [];
+  for (let i = 0; i < 4; i++) {
+    const d = draw(shoe);
+    dealt.push(d.card);
+    shoe = d.deck;
+  }
 
   const newBankroll = state.bankroll - bet;
 
   const newState = {
     ...state,
+    rng,
+    shoe,
     bankroll: newBankroll,
     bet,
     phase: 'playing',
-    player: [c1.card, c3.card],
-    dealer: [c2.card, c4.card],
+    player: [dealt[0], dealt[2]],
+    dealer: [dealt[1], dealt[3]],
     doubled: false,
     result: null,
     payout: 0,
@@ -142,11 +144,17 @@ export function startRound(state, bet) {
   return newState;
 }
 
+function drawFrom(state) {
+  const shoe = state.shoe.length > 0 ? state.shoe : createShoe(6, state.rng || Math.random);
+  const d = draw(shoe);
+  return { card: d.card, deck: d.deck };
+}
+
 export function hit(state) {
   if (state.phase !== 'playing') {
     throw new Error('Not playing');
   }
-  const d = draw(state.shoe);
+  const d = drawFrom(state);
   const next = {
     ...state,
     shoe: d.deck,
@@ -167,7 +175,7 @@ export function stand(state) {
   }
   let s = { ...state };
   while (handValue(s.dealer).total < 17) {
-    const d = draw(s.shoe);
+    const d = drawFrom(s);
     s = {
       ...s,
       shoe: d.deck,
@@ -181,7 +189,7 @@ export function doubleDown(state) {
   if (state.phase !== 'playing' || state.player.length !== 2 || state.bankroll < state.bet) {
     throw new Error('Cannot double');
   }
-  const d = draw(state.shoe);
+  const d = drawFrom(state);
   const next = {
     ...state,
     shoe: d.deck,
