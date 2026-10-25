@@ -1,4 +1,5 @@
 import { colorOf } from '../engine/roulette.js';
+import './rouletteBoard.css';
 
 const ROWS = [[3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36], [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35], [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34]];
 
@@ -57,16 +58,16 @@ export default function RouletteBoard({ bets, onBet, disabled, winningNumber }) 
         <Cell type='dozen' value={3} className='rb-dozen' title='3rd 12, 2 to 1'>3rd 12</Cell>
       </div>
       <div className='rb-outside'>
-        <Cell type='low' value={null} className='rb-outside' title='1-18, 1 to 1'>1-18</Cell>
-        <Cell type='even' value={null} className='rb-outside' title='Even, 1 to 1'>Even</Cell>
-        <Cell type='red' value={null} className='rb-outside' title='Red, 1 to 1'>
+        <Cell type='low' value={null} className='rb-out' title='1-18, 1 to 1'>1-18</Cell>
+        <Cell type='even' value={null} className='rb-out' title='Even, 1 to 1'>Even</Cell>
+        <Cell type='red' value={null} className='rb-out' title='Red, 1 to 1'>
           <span className='rb-diamond rb-diamond-red'></span>
         </Cell>
-        <Cell type='black' value={null} className='rb-outside' title='Black, 1 to 1'>
+        <Cell type='black' value={null} className='rb-out' title='Black, 1 to 1'>
           <span className='rb-diamond rb-diamond-black'></span>
         </Cell>
-        <Cell type='odd' value={null} className='rb-outside' title='Odd, 1 to 1'>Odd</Cell>
-        <Cell type='high' value={null} className='rb-outside' title='19-36, 1 to 1'>19-36</Cell>
+        <Cell type='odd' value={null} className='rb-out' title='Odd, 1 to 1'>Odd</Cell>
+        <Cell type='high' value={null} className='rb-out' title='19-36, 1 to 1'>19-36</Cell>
       </div>
     </div>
   );
