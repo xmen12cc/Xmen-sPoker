@@ -39,6 +39,8 @@ A Vite + React casino game application featuring Blackjack and Texas Hold'em.
 - Bets on straight numbers, red/black, odd/even, 1–18/19–36, dozens and columns
 - Payouts: straight 35:1, dozens and columns 2:1, even-money bets 1:1
 - Zero loses all outside bets
+- Rebet re-places the previous round's bets; Double doubles the bets on the table (both only when affordable)
+- After each spin a coloured badge shows the winning number and a banner shows the net result
 - Start with a 1000 bankroll; choose a chip value, click the board to place bets, then spin
 
 **Audio:**
@@ -53,7 +55,7 @@ A Vite + React casino game application featuring Blackjack and Texas Hold'em.
 
 **Texas Hold'em** — the casino acts automatically after you, use the raise slider or all-in, the casino's cards are revealed at showdown; if you run out of chips press New Game.
 
-**Roulette** — European single-zero wheel with 37 pockets. Place bets on straight numbers, red/black, odd/even, 1–18/19–36, dozens and columns. Payouts: straight 35:1, dozens and columns 2:1, even-money bets 1:1. The zero loses all outside bets. Start with a 1000 bankroll, choose a chip value, click the board to place bets, then press Spin.
+**Roulette** — European single-zero wheel with 37 pockets. Place bets on straight numbers, red/black, odd/even, 1–18/19–36, dozens and columns. Payouts: straight 35:1, dozens and columns 2:1, even-money bets 1:1. The zero loses all outside bets. Start with a 1000 bankroll, choose a chip value, click the board to place bets, then press Spin. Rebet puts the previous round's bets back and Double doubles what is on the table, both only when the bankroll allows. After the spin the winning number is shown in a coloured badge with the net result in a banner; if you run out of chips press New Game.
 
 ## Project Structure
 

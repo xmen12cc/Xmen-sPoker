@@ -11,6 +11,8 @@ import {
   newRouletteGame,
   placeBet,
   clearBets,
+  rebet,
+  doubleBets,
   resolveRound,
   nextRoulette,
 } from './roulette.js';
@@ -623,5 +625,119 @@ describe('placeBet', () => {
     expect(result.phase).toBe('betting');
     expect(result.bets.length).toBe(0);
     expect(result.lastNet).toBe(0);
+  });
+});
+
+describe('rebet', () => {
+  let state;
+
+  beforeEach(() => {
+    state = newRouletteGame();
+  });
+
+  it('resolveRound stores lastBets so the previous round can be re-placed', () => {
+    state = placeBet(state, 'straight', 7, 10);
+    state = placeBet(state, 'red', 1, 100);
+    state = resolveRound(state, 7);
+    expect(state.lastBets).toEqual([
+      { type: 'straight', value: 7, amount: 10 },
+      { type: 'red', value: 1, amount: 100 },
+    ]);
+  });
+
+  it('rebet re-places the previous bets and charges the bankroll', () => {
+    state = placeBet(state, 'straight', 7, 10);
+    state = resolveRound(state, 7);
+    state = nextRoulette(state);
+    const result = rebet(state);
+    expect(result.phase).toBe('betting');
+    expect(result.bankroll).toBe(state.bankroll - 10);
+    expect(result.bets).toEqual([{ type: 'straight', value: 7, amount: 10 }]);
+  });
+
+  it('rebet merges with bets already on the table', () => {
+    state = placeBet(state, 'red', 1, 50);
+    state = resolveRound(state, 1);
+    state = nextRoulette(state);
+    state = placeBet(state, 'black', 1, 20);
+    const result = rebet(state);
+    expect(result.bets).toEqual([
+      { type: 'black', value: 1, amount: 20 },
+      { type: 'red', value: 1, amount: 50 },
+    ]);
+    // bankroll: 1000 - 50 bet, +100 red win = 1050, -20 new bet, -50 rebet = 980
+    expect(result.bankroll).toBe(980);
+  });
+
+  it('rebet throws when the previous bets are not affordable', () => {
+    state = newRouletteGame(50);
+    state = placeBet(state, 'straight', 7, 40);
+    state = resolveRound(state, 3);
+    state = nextRoulette(state);
+    expect(() => {
+      state = rebet(state);
+    }).toThrow('Not enough bankroll to rebet');
+  });
+
+  it('rebet throws with no previous bets', () => {
+    expect(() => {
+      state = rebet(state);
+    }).toThrow('No previous bets to rebet');
+  });
+
+  it('rebet throws when phase is not betting', () => {
+    state = placeBet(state, 'straight', 7, 10);
+    state = resolveRound(state, 7);
+    expect(() => {
+      state = rebet(state);
+    }).toThrow('Not in betting phase');
+  });
+});
+
+describe('doubleBets', () => {
+  let state;
+
+  beforeEach(() => {
+    state = newRouletteGame();
+  });
+
+  it('doubleBets doubles every bet on the table and charges the difference', () => {
+    state = placeBet(state, 'straight', 7, 10);
+    state = placeBet(state, 'red', 1, 100);
+    const result = doubleBets(state);
+    expect(result.bets).toEqual([
+      { type: 'straight', value: 7, amount: 20 },
+      { type: 'red', value: 1, amount: 200 },
+    ]);
+    expect(result.bankroll).toBe(1000 - 10 - 100 - 110);
+  });
+
+  it('doubleBets does not mutate the original bets', () => {
+    state = placeBet(state, 'red', 1, 100);
+    const result = doubleBets(state);
+    expect(state.bets[0].amount).toBe(100);
+    expect(result.bets[0].amount).toBe(200);
+  });
+
+  it('doubleBets throws when the table total is not affordable', () => {
+    state = newRouletteGame(150);
+    state = placeBet(state, 'straight', 7, 100);
+    expect(() => {
+      state = doubleBets(state);
+    }).toThrow('Not enough bankroll to double');
+  });
+
+  it('doubleBets throws with no bets on the table', () => {
+    expect(() => {
+      state = doubleBets(state);
+    }).toThrow('No bets to double');
+  });
+
+  it('doubleBets throws when phase is not betting', () => {
+    state = placeBet(state, 'straight', 7, 10);
+    state = resolveRound(state, 7);
+    expect(() => {
+      state = doubleBets(state);
+    }).toThrow('Not in betting phase');
   });
 });

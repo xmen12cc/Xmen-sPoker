@@ -71,8 +71,13 @@ export function newRouletteGame(bankroll = 1000) {
     lastNumber: null,
     history: [],
     lastNet: 0,
+    lastBets: [],
     message: '',
   };
+}
+
+function totalStaked(bets) {
+  return bets.reduce((sum, b) => sum + b.amount, 0);
 }
 
 export function placeBet(state, type, value, amount) {
@@ -104,6 +109,40 @@ export function clearBets(state) {
   return { ...state, bankroll: state.bankroll + refund, bets: [], phase: 'betting', message: '' };
 }
 
+export function rebet(state) {
+  if (state.phase !== 'betting') {
+    throw new Error('Not in betting phase');
+  }
+  if (state.lastBets.length === 0) {
+    throw new Error('No previous bets to rebet');
+  }
+  if (totalStaked(state.lastBets) > state.bankroll) {
+    throw new Error('Not enough bankroll to rebet');
+  }
+  let next = state;
+  for (const bet of state.lastBets) {
+    next = placeBet(next, bet.type, bet.value, bet.amount);
+  }
+  return next;
+}
+
+export function doubleBets(state) {
+  if (state.phase !== 'betting') {
+    throw new Error('Not in betting phase');
+  }
+  if (state.bets.length === 0) {
+    throw new Error('No bets to double');
+  }
+  if (totalStaked(state.bets) > state.bankroll) {
+    throw new Error('Not enough bankroll to double');
+  }
+  return {
+    ...state,
+    bankroll: state.bankroll - totalStaked(state.bets),
+    bets: state.bets.map(b => ({ ...b, amount: b.amount * 2 })),
+  };
+}
+
 export function resolveRound(state, number) {
   if (state.phase !== 'betting' || state.bets.length === 0) {
     throw new Error('No bets placed');
@@ -129,6 +168,7 @@ export function resolveRound(state, number) {
     lastNumber: number,
     history: [number, ...state.history].slice(0, 12),
     lastNet: net,
+    lastBets: state.bets.map(b => ({ ...b })),
     bets: state.bets,
     message,
   };

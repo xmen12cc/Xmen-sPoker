@@ -21,9 +21,9 @@ export default function RouletteWheel({ spinId, result, spinning, onDone }) {
   }
 
   useEffect(() => {
-    if (!spinning) {
-      lastSpinId.current = spinId
-    }
+    // sync on spin start too, otherwise the first spin's animationend
+    // can never satisfy the guard (ref stuck at the mount-time spinId)
+    lastSpinId.current = spinId
   }, [spinning, spinId])
 
   return (
@@ -52,7 +52,12 @@ export default function RouletteWheel({ spinId, result, spinning, onDone }) {
       >
         <div className='rw-ball'></div>
       </div>
-      <div className='rw-pointer'></div>
+      <div
+        className='rw-pointer-arm'
+        style={{ '--pointer-angle': (spinning || result === null ? 0 : slotAngle) + 'deg' }}
+      >
+        <div className='rw-pointer'></div>
+      </div>
     </div>
   )
 }
