@@ -1,1 +1,147 @@
-/* roulette wheel placeholder - styles to be added in next task */
+.rw-wrap {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+  aspect-ratio: 1;
+  max-width: 90vw;
+  --rw-size: min(300px, 90vw);
+}
+
+.rw-wheel {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #3b2a14 0 30%, #5a3d1a 31% 100%);
+  border: 6px solid #c9a227;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.rw-wheel.rw-spinning {
+  animation: rw-wheel-spin 5s cubic-bezier(0.15, 0.6, 0.25, 1) forwards;
+}
+
+.rw-wheel {
+  transform: rotate(var(--wheel-end, 0deg));
+}
+
+@keyframes rw-wheel-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(var(--wheel-end));
+  }
+}
+
+.rw-slot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 0;
+  height: 50%;
+  transform-origin: bottom center;
+}
+
+.rw-slot::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -5px;
+  width: 10px;
+  height: 22%;
+  border-radius: 2px;
+}
+
+.rw-red::before {
+  background: #b71c1c;
+}
+
+.rw-black::before {
+  background: #151515;
+}
+
+.rw-green::before {
+  background: #1b7a3a;
+}
+
+.rw-num {
+  position: absolute;
+  top: 3%;
+  left: 0;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: bold;
+  color: white;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+
+.rw-hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 28%;
+  height: 28%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd700 0%, #c9a227 100%);
+  border: 2px solid #8b6914;
+}
+
+.rw-ball-orbit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: rotate(0deg);
+}
+
+.rw-ball-orbit.rw-spinning {
+  animation: rw-ball-spin 5s cubic-bezier(0.2, 0.5, 0.2, 1) forwards;
+}
+
+.rw-ball-orbit.rw-stopped {
+  transform: rotate(var(--ball-end));
+}
+
+@keyframes rw-ball-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(var(--ball-end));
+  }
+}
+
+.rw-ball {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  margin-left: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #999999);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.rw-pointer {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 14px solid #ffd700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rw-wheel.rw-spinning,
+  .rw-ball-orbit.rw-spinning {
+    animation-duration: 0.01s;
+  }
+}
