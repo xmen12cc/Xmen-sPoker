@@ -87,11 +87,15 @@ describe('startHand does not mutate its input', () => {
 });
 
 describe('short stack', () => {
-  it('handles a player with only 5 chips', () => {
+  it('handles a player with only 5 chips: all-in small blind runs out to showdown', () => {
     const s = startHand(newPokerGame(5, 1000), mulberry32(1));
-    expect(s.player.bet).toBe(5);
+    expect(s.player.totalBet).toBe(5);
     expect(s.player.allIn).toBe(true);
-    expect(s.player.chips).toBe(0);
+    expect(s.player.chips).toBeGreaterThanOrEqual(0);
+    expect(s.street).toBe('done');
+    expect(s.toAct).toBe(null);
+    expect(s.pot).toBe(0);
+    expect(s.player.chips + s.casino.chips).toBe(1005);
   });
 });
 

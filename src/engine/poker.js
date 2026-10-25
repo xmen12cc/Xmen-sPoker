@@ -28,6 +28,8 @@ export function newPokerGame(playerChips = 1000, casinoChips = 1000) {
     winner: null,
     message: 'Place your first hand',
     showdown: null,
+    lastAction: null,
+    potWon: 0,
     handNumber: 0,
   };
 }
@@ -64,7 +66,7 @@ export function startHand(state, rng = Math.random) {
   }
   seats.player = { ...seats.player, hole: holes.player };
   seats.casino = { ...seats.casino, hole: holes.casino };
-  return {
+  const next = {
     ...state,
     deck,
     community: [],
@@ -80,8 +82,13 @@ export function startHand(state, rng = Math.random) {
     winner: null,
     message: '',
     showdown: null,
+    lastAction: null,
+    potWon: 0,
     handNumber: state.handNumber + 1,
   };
+  // An all-in small blind closes the betting: no one can act or raise, so run it out.
+  if (seats[button].allIn) return endRound(next);
+  return next;
 }
 
 function commit(seat, amount) {
@@ -122,16 +129,21 @@ function dealCommunity(state, n) {
 
 function awardFold(state, folder) {
   const winner = other(folder);
-  const seat = { ...state[winner], chips: state[winner].chips + state.pot };
+  const pot = state.pot;
+  const clear = (seat) => ({ ...seat, bet: 0 });
+  const seat = { ...clear(state[winner]), chips: state[winner].chips + pot };
   return {
     ...state,
     [winner]: seat,
+    [folder]: clear(state[folder]),
     pot: 0,
     street: 'done',
     toAct: null,
     winner,
     message: folder === 'player' ? 'You folded' : 'Casino folds',
     showdown: null,
+    lastAction: (folder === 'player' ? 'You fold' : 'Casino folds'),
+    potWon: pot,
   };
 }
 
@@ -169,6 +181,7 @@ function awardShowdown(state) {
     winner,
     message,
     showdown: { player: p, casino: c, amount: pot },
+    potWon: pot,
   };
 }
 
@@ -213,13 +226,17 @@ export function applyAction(state, action, amount = 0) {
   let minRaise = state.minRaise;
   const acted = { ...state.acted, [who]: true };
   const owe = currentBet - me.bet;
+  const name = who === 'player' ? 'You' : 'Casino';
   if (action === 'fold') {
     return awardFold({ ...state, [who]: { ...me, folded: true } }, who);
   }
+  let lastAction;
   if (action === 'check') {
     if (owe > 0) throw new Error('Cannot check');
+    lastAction = name + ' checks';
   } else if (action === 'call') {
     if (owe <= 0) throw new Error('Nothing to call');
+    lastAction = name + ' calls $' + Math.min(owe, me.chips);
     me = commit(me, owe);
   } else if (action === 'raise') {
     const limit = me.bet + me.chips;
@@ -231,10 +248,13 @@ export function applyAction(state, action, amount = 0) {
     currentBet = to;
     me = commit(me, to - me.bet);
     acted[opp] = false;
+    lastAction = name + (to === limit
+      ? (who === 'player' ? ' are all in for $' : ' is all in for $') + to
+      : ' raises to $' + to);
   } else {
     throw new Error('Unknown action');
   }
-  const next = { ...state, [who]: me, [opp]: them, currentBet, minRaise, acted };
+  const next = { ...state, [who]: me, [opp]: them, currentBet, minRaise, acted, lastAction };
   next.pot = me.totalBet + them.totalBet;
   const done =
     (me.allIn || acted[who]) &&

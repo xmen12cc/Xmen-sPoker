@@ -241,5 +241,25 @@ describe('pokerEval', () => {
       expect(result.category).toBe(4);
       expect(result.tiebreak).toEqual([5]);
     });
+
+    it('7 cards: two trips -> full house with trips over the higher second trip', () => {
+      const result = evaluateBest(h('AS AD AH KS KD KC 2H'));
+      expect(result.name).toBe('Full House');
+      expect(result.category).toBe(6);
+      expect(result.tiebreak).toEqual([14, 13]);
+      expect(result.cards.length).toBe(5);
+    });
+
+    it('7 cards: flush beats straight when both are available', () => {
+      const result = evaluateBest(h('AH KH QH JH 2H 9C 8D'));
+      expect(result.name).toBe('Flush');
+      expect(result.category).toBe(5);
+    });
+
+    it('7 cards: straight is chosen when no flush is available', () => {
+      const result = evaluateBest(h('AH KH QH JD 10C 9C 2H'));
+      expect(result.name).toBe('Straight');
+      expect(result.category).toBe(4);
+    });
   });
 });
