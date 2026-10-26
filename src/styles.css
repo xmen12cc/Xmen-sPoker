@@ -1,35 +1,53 @@
 :root {
   --felt: #0b3d2e;
+  --felt-dark: #06231a;
   --gold: #d4af37;
+}
+
+html {
+  background: var(--felt-dark);
 }
 
 body {
   margin: 0;
   font-family: Georgia, serif;
   color: #f5f1e0;
-  background: radial-gradient(circle at center, var(--felt), #06231a);
+  background: radial-gradient(circle at center, var(--felt), var(--felt-dark));
   min-height: 100vh;
+}
+
+:where(button, [role='button'], a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .app {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   min-height: 100vh;
+  /* top padding keeps content clear of the fixed sound toggle on small screens */
+  padding: 64px 16px 32px;
 }
 
+/* ---- Lobby ---- */
+
 .lobby {
+  width: 100%;
+  max-width: 960px;
   text-align: center;
+}
+
+.lobby-header {
+  animation: lobby-rise 0.5s ease backwards;
 }
 
 .lobby h1 {
   font-size: 3rem;
   color: var(--gold);
-  margin-bottom: 2rem;
+  margin: 0 0 0.5rem;
   text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-}
-
-.lobby h1 {
   animation: shimmer 3s ease-in-out infinite;
 }
 
@@ -41,7 +59,7 @@ body {
 .lobby-tagline {
   font-size: 16px;
   color: rgba(212, 175, 55, 0.7);
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.75rem;
 }
 
 .lobby-games {
@@ -52,14 +70,22 @@ body {
 }
 
 .game-tile {
-  min-width: 220px;
-  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 220px;
+  max-width: 280px;
+  padding: 24px 20px;
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.25);
   border: 2px solid var(--gold);
-  font-size: 24px;
+  font-family: inherit;
+  color: #f5f1e0;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  animation: lobby-rise 0.5s ease backwards;
+  animation-delay: var(--tile-delay, 0ms);
 }
 
 .game-tile:hover {
@@ -67,66 +93,88 @@ body {
   box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35);
 }
 
-.tile-sub {
-  display: block;
+.tile-icon {
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.tile-name {
+  font-size: 24px;
+}
+
+.tile-rule {
   font-size: 13px;
-  opacity: 0.8;
-  margin-top: 6px;
+  opacity: 0.85;
 }
 
-.lobby button {
-  display: block;
-  margin: 0.5rem auto;
-  padding: 0.75rem 2rem;
-  font-size: 1.2rem;
-  font-family: Georgia, serif;
+.tile-wallet {
+  font-size: 14px;
   color: var(--gold);
-  background: rgba(212, 175, 55, 0.1);
-  border: 2px solid var(--gold);
+}
+
+.tile-play {
+  margin-top: 10px;
+  padding: 6px 26px;
+  font-size: 15px;
+  color: var(--gold);
+  border: 1px solid var(--gold);
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s, color 0.2s;
 }
 
-.lobby button:hover {
+.game-tile:hover .tile-play,
+.game-tile:focus-visible .tile-play {
   background: var(--gold);
   color: #0b3d2e;
-  box-shadow: 0 0 20px var(--gold);
 }
 
-.app {
-  min-height: 100vh;
+@keyframes lobby-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-body {
-  margin: 0;
-}
-
-.view h2 {
-  color: var(--gold);
-  font-size: 2rem;
-}
-
-.view p {
-  color: #aaa;
-  font-size: 1.2rem;
-}
-
-.view button {
-  margin-top: 1rem;
-  padding: 0.5rem 1.5rem;
-  font-size: 1rem;
-  font-family: Georgia, serif;
-  color: var(--gold);
-  background: rgba(212, 175, 55, 0.1);
-  border: 2px solid var(--gold);
-  border-radius: 6px;
+.lobby-reset {
+  margin-top: 28px;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  color: rgba(245, 241, 224, 0.7);
+  background: none;
+  border: none;
+  text-decoration: underline;
   cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.view button:hover {
-  background: var(--gold);
-  color: #0b3d2e;
-  box-shadow: 0 0 15px var(--gold);
+.lobby-reset:hover {
+  color: var(--gold);
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding: 56px 12px 24px;
+  }
+
+  .lobby h1 {
+    font-size: 2.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lobby-header,
+  .lobby h1,
+  .game-tile {
+    animation: none;
+  }
+
+  .game-tile,
+  .game-tile:hover {
+    transition: none;
+    transform: none;
+  }
 }

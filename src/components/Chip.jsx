@@ -2,16 +2,16 @@ import './cards.css'
 
 export default function Chip({ value, onClick, disabled }) {
   return (
-    <div
+    <button
+      type="button"
       className="chip"
       data-value={value}
-      style={{ transform: `scale(${1 + (value / 1000) * 0.2})` }}
-      onClick={onClick}
-      role="button"
-      tabIndex={0}
+      style={{ '--chip-scale': 1 + (value / 1000) * 0.2 }}
+      disabled={disabled}
       aria-label={`Bet ${value}`}
+      onClick={onClick}
     >
       ${value}
-    </div>
+    </button>
   )
 }

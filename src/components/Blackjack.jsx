@@ -4,10 +4,14 @@ import PlayingCard from './PlayingCard.jsx'
 import Chip from './Chip.jsx'
 import Dealer from './Dealer.jsx'
 import { play } from '../audio/sound.js'
+import { STORAGE_KEYS, loadNumber, saveNumber } from '../storage.js'
 import './blackjack.css'
 
 export default function Blackjack({ onBack }) {
-  const [game, setGame] = useState(() => newGame(1000))
+  const [game, setGame] = useState(() => {
+    const saved = loadNumber(STORAGE_KEYS.blackjackBankroll, 1000)
+    return newGame(saved > 0 ? saved : 1000)
+  })
   const [pendingBet, setPendingBet] = useState(0)
   const [round, setRound] = useState(0)
   const [dealerDealing, setDealerDealing] = useState(false)
@@ -21,6 +25,10 @@ export default function Blackjack({ onBack }) {
     soundTimers.current.forEach(clearTimeout)
     soundTimers.current = []
   }, [])
+
+  useEffect(() => {
+    saveNumber(STORAGE_KEYS.blackjackBankroll, game.bankroll)
+  }, [game.bankroll])
 
   const playerTotal = handValue(game.player).total
   const dealerTotal = handValue(game.dealer).total

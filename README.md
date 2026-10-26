@@ -1,6 +1,6 @@
 # Xmen's Poker
 
-A Vite + React casino game application featuring Blackjack and Texas Hold'em.
+A Vite + React casino game application featuring Blackjack, Texas Hold'em and Roulette.
 
 ## Quick Start
 
@@ -43,6 +43,14 @@ A Vite + React casino game application featuring Blackjack and Texas Hold'em.
 - After each spin a coloured badge shows the winning number and a banner shows the net result
 - Start with a 1000 bankroll; choose a chip value, click the board to place bets, then spin
 
+**Lobby & persistence:**
+- Lobby with one card per game: icon, rule summary and the saved bankroll/stack
+- Blackjack and Roulette bankrolls persist across visits and reloads
+- Poker player/casino stacks persist when a hand ends
+- "New Game" buttons reset to 1000 (poker to 1000/1000)
+- "Reset all progress" link in the lobby clears all saved values
+- Graceful fallback to defaults when localStorage is unavailable
+
 **Audio:**
 - Synthesized sound effects (Web Audio API, no audio files)
 - Play card deals, chip sounds, button clicks, card flips, bets, folds, checks, wins, and losses
@@ -57,6 +65,8 @@ A Vite + React casino game application featuring Blackjack and Texas Hold'em.
 
 **Roulette** — European single-zero wheel with 37 pockets. Place bets on straight numbers, red/black, odd/even, 1–18/19–36, dozens and columns. Payouts: straight 35:1, dozens and columns 2:1, even-money bets 1:1. The zero loses all outside bets. Start with a 1000 bankroll, choose a chip value, click the board to place bets, then press Spin. Rebet puts the previous round's bets back and Double doubles what is on the table, both only when the bankroll allows. After the spin the winning number is shown in a coloured badge with the net result in a banner; if you run out of chips press New Game.
 
+Progress (bankrolls and poker stacks) is saved automatically; use the lobby's "Reset all progress" link or a game's "New Game" button to start over at 1000.
+
 ## Project Structure
 
 - `src/engine/`: Core game logic
@@ -66,6 +76,8 @@ A Vite + React casino game application featuring Blackjack and Texas Hold'em.
   - `pokerEval.js`: 5-card and best-of-7 hand ranking and comparison
   - `pokerAI.js`: Casino AI decision logic
   - `roulette.js`: European roulette game rules and state machine
+- `src/App.jsx`: App shell and lobby (game cards, saved bankrolls, reset link)
+- `src/storage.js`: Safe localStorage helpers for bankroll/stack persistence
 - `src/components/`: React UI components
   - `Blackjack.jsx`: Blackjack game component
   - `Poker.jsx`: Texas Hold'em game component
@@ -80,6 +92,7 @@ A Vite + React casino game application featuring Blackjack and Texas Hold'em.
   - `sound.js`: Web Audio API synthesizer (no audio files), mute toggle
 - `src/components/**/*.css`: Styling for all components
 - `src/engine/*.test.js`: Unit tests for game logic
+- `src/storage.test.js`: Tests for the storage helpers
 
 ## Scripts
 

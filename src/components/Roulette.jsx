@@ -4,6 +4,7 @@ import RouletteBoard from './RouletteBoard.jsx';
 import RouletteWheel from './RouletteWheel.jsx';
 import Chip from './Chip.jsx';
 import { play } from '../audio/sound.js';
+import { STORAGE_KEYS, loadNumber, saveNumber } from '../storage.js';
 import './roulette.css';
 
 const CHIP_VALUES = [5, 25, 100, 500];
@@ -13,7 +14,10 @@ function staked(bets) {
 }
 
 function Roulette({ onBack }) {
-  const [game, setGame] = useState(() => newRouletteGame(1000));
+  const [game, setGame] = useState(() => {
+    const saved = loadNumber(STORAGE_KEYS.rouletteBankroll, 1000);
+    return newRouletteGame(saved > 0 ? saved : 1000);
+  });
   const [chipValue, setChipValue] = useState(25);
   const [spinId, setSpinId] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -36,6 +40,10 @@ function Roulette({ onBack }) {
     else if (game.lastNet < 0) play('lose');
     else play('push');
   }, [game.phase, game.lastNet]);
+
+  useEffect(() => {
+    saveNumber(STORAGE_KEYS.rouletteBankroll, game.bankroll);
+  }, [game.bankroll]);
 
   const handleWheelDone = () => {
     if (!spinning) return;

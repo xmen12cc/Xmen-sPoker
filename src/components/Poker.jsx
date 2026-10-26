@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { newPokerGame, startHand, applyAction, legalActions } from '../engine/poker.js'
 import { playCasinoTurn } from '../engine/pokerAI.js'
 import { play } from '../audio/sound.js'
+import { STORAGE_KEYS, loadNumber, saveNumber } from '../storage.js'
 import PlayingCard from './PlayingCard.jsx'
 import Dealer from './Dealer.jsx'
 import './poker.css'
@@ -9,7 +10,11 @@ import './poker.css'
 const STREET_LABELS = { preflop: 'Preflop', flop: 'Flop', turn: 'Turn', river: 'River' }
 
 export default function Poker({ onBack }) {
-  const [game, setGame] = useState(() => newPokerGame(1000, 1000))
+  const [game, setGame] = useState(() => {
+    const player = loadNumber(STORAGE_KEYS.pokerPlayer, 0)
+    const casino = loadNumber(STORAGE_KEYS.pokerCasino, 0)
+    return player > 0 && casino > 0 ? newPokerGame(player, casino) : newPokerGame(1000, 1000)
+  })
   const [raiseTo, setRaiseTo] = useState(0)
   const prevCommunityLength = useRef(0)
   const prevCasinoBet = useRef(0)
@@ -43,6 +48,12 @@ export default function Poker({ onBack }) {
     timersRef.current.push(t)
   }
   useEffect(() => () => timersRef.current.forEach((t) => clearTimeout(t)), [])
+
+  useEffect(() => {
+    if (game.street !== 'done') return
+    saveNumber(STORAGE_KEYS.pokerPlayer, game.player.chips)
+    saveNumber(STORAGE_KEYS.pokerCasino, game.casino.chips)
+  }, [game.street, game.player.chips, game.casino.chips])
 
   useEffect(() => {
     if (!casinoTurn) return undefined
@@ -98,7 +109,11 @@ export default function Poker({ onBack }) {
     for (let i = 0; i < 4; i++) later(() => play('cardDeal'), i * 120)
     setGame((g) => startHand(g))
   }
-  const restart = () => setGame(newPokerGame(1000, 1000))
+  const restart = () => {
+    saveNumber(STORAGE_KEYS.pokerPlayer, 1000)
+    saveNumber(STORAGE_KEYS.pokerCasino, 1000)
+    setGame(newPokerGame(1000, 1000))
+  }
 
   const board = []
   for (let i = 0; i < 5; i++) board.push(game.community[i])
